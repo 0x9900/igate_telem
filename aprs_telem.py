@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
 #
 # (C) 2019-2020 Fred C. (W6BSD)
-# https://github.com/0x9900/fllog
+# https://github.com/0x9900/igate_telem
 #
 # EQNS. is a, b, c | DisplayValue = a * val ^ 2 + b * val + c
 # pylint: disable=missing-docstring
