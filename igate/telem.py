@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 #
-# (C) 2019-2020 Fred C. (W6BSD)
+# (c) 2020 Fred C. (W6BSD)
 # https://github.com/0x9900/igate_telem
 #
 # EQNS. is a, b, c | DisplayValue = a * val ^ 2 + b * val + c
 # pylint: disable=missing-docstring
+
+from __future__ import print_function
+
+__author__ = "Fred C."
+__email__ = "<github-fred@hidzz.com>"
+__version__ = '0.1.0'
 
 import cPickle as pickle
 import itertools
@@ -70,7 +76,7 @@ class TelemStatus(object):
       with open(STATUS_FILE, 'w') as sfd:
         sfd.write(pickle.dumps(self.st_data))
     except IOError as err:
-      print err
+      print(err)
 
   @property
   def sequence(self):
@@ -160,13 +166,13 @@ def read_temperature():
 def send_data(sequence, *data):
   data = data + (0,) * 5
   payload = ','.join([str(x) for x in data[:5]])
-  print "T#{:03d},{},00000000".format(sequence, payload)
+  print("T#{:03d},{},00000000".format(sequence, payload))
 
 
 def aprs_send(call, key, *val):
   values = ','.join([str(x).strip() for x in val])
   stanza = STANZA_TEMPLATE.format(call, key, values)
-  print stanza
+  print(stanza)
 
 
 def aprs_eqns(call, *coef):
