@@ -12,10 +12,10 @@ The metrics sent by the iGate are:
 
 ## Usage:
 ```
-CBEACON delay=0:10 every=5:00 SENDTO=IG infocmd="/usr/local/bin/telem_temp --param"
-CBEACON delay=0:12 every=5:00 SENDTO=IG infocmd="/usr/local/bin/telem_temp --unit"
-CBEACON delay=0:14 every=5:00 SENDTO=IG infocmd="/usr/local/bin/telem_temp --eqns"
-CBEACON delay=0:15 every=5:00 SENDTO=IG infocmd="/usr/local/bin/telem_temp --data"
+CBEACON delay=0:10 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --param"
+CBEACON delay=0:12 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --unit"
+CBEACON delay=0:14 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --eqns"
+CBEACON delay=0:15 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --data"
 ```
 
 ## Example:

@@ -6,15 +6,17 @@
 # EQNS. is a, b, c | DisplayValue = a * val ^ 2 + b * val + c
 # pylint: disable=missing-docstring
 
+import cPickle as pickle
 import itertools
-import os
 import re
+import time
 
 from argparse import ArgumentParser
 from collections import Mapping
 from functools import partial
 
-SEQUENCE_FILE = "/tmp/aprs_seq.dat"
+STATUS_FILE = "/tmp/aprs_status.dat"
+
 LOADAVG_FILE = "/proc/loadavg"
 MEMINFO_FILE = "/proc/meminfo"
 
@@ -47,6 +49,86 @@ class MemInfo(Mapping):
   def __len__(self):
     return len(MemInfo._cache)
 
+
+class TelemStatus(object):
+
+  def __init__(self):
+    try:
+      with open(STATUS_FILE, 'r') as sfd:
+        self.st_data = pickle.loads(sfd.read())
+    except IOError:
+      self.st_data = dict(seq=0, timestamp=int(time.time()), rx_packets=0, tx_packets=0)
+
+    self.st_data['seq'] = (self.st_data['seq'] % 999) + 1
+
+  def __repr__(self):
+    return "%s %s" % (self.__class__, self.st_data)
+
+  def save(self):
+    self.st_data['timestamp'] = int(time.time())
+    try:
+      with open(STATUS_FILE, 'w') as sfd:
+        sfd.write(pickle.dumps(self.st_data))
+    except IOError as err:
+      print err
+
+  @property
+  def sequence(self):
+    return self.st_data['seq']
+
+  @property
+  def timestamp(self):
+    return self.st_data['timestamp']
+
+  @property
+  def rx_packets(self):
+    return self.st_data['rx_packets']
+
+  @rx_packets.setter
+  def rx_packets(self, value):
+    self.st_data['rx_packets'] = value
+
+  @property
+  def tx_packets(self):
+    return self.st_data['tx_packets']
+
+  @tx_packets.setter
+  def tx_packets(self, value):
+    self.st_data['tx_packets'] = value
+
+
+
+def get_default_iface():
+  # We are interested by the fields
+  # 0 = iface, 1 = dest, 3 = flags
+  route = "/proc/net/route"
+  with open(route, 'r') as rfd:
+    for line in rfd:
+      try:
+        rinfo = line.strip().split()
+        if rinfo[1] != '00000000' or not int(rinfo[3], 16) & 2:
+          continue
+        return rinfo[0]
+      except KeyError:
+        continue
+
+
+def network_packets(iface):
+  try:
+    with open('/proc/net/dev', 'r') as ifd:
+      for line in ifd:
+        if line.find(iface) >= 0:
+          data = line.split()
+          break
+      else:
+        raise SystemError
+
+    rx_packets, tx_packets = (data[2], data[10])
+    return (int(rx_packets), int(tx_packets))
+  except (IOError, ValueError, SystemError):
+    return (0, 0)
+
+
 def read_loadavg():
   try:
     with open(LOADAVG_FILE, 'r') as lfd:
@@ -61,6 +143,7 @@ def read_loadavg():
 
   return int(load15 * 1000)
 
+
 def read_temperature():
   try:
     with open(THERMFILE) as tfd:
@@ -70,46 +153,34 @@ def read_temperature():
     temperature = 0
   return temperature
 
-def get_sequence():
-  try:
-    if not os.path.exists(SEQUENCE_FILE):
-      with open(SEQUENCE_FILE, 'a') as sfd:
-        sfd.write("1")
-        return 1
-    else:
-      with open(SEQUENCE_FILE, 'r+') as sfd:
-        seq = int(sfd.read())
-        seq = (seq % 999) + 1
-        sfd.seek(0L)
-        sfd.truncate()
-        sfd.write(str(seq))
-  except (IOError, ValueError):
-    seq = 1
-  return seq
 
-def send_data(*data):
-  sequence = get_sequence()
+def send_data(sequence, *data):
   data = data + (0,) * 5
   payload = ','.join([str(x) for x in data[:5]])
   print "T#{},{},00000000".format(sequence, payload)
+
 
 def aprs_send(call, key, *val):
   values = ','.join([str(x).strip() for x in val])
   stanza = STANZA_TEMPLATE.format(call, key, values)
   print stanza
 
+
 def aprs_eqns(call, *coef):
   payload = coef + ((0, 1, 0),) * 5
   payload = list(itertools.chain.from_iterable(payload))
   aprs_send(call, "EQNS", *payload[:5*3])
 
+
 def aprs_param(call, *val):
   payload = list(val) + ["Vx{}".format(i) for i in range(1, 5)]
   aprs_send(call, "PARM", *payload[:5])
 
+
 def aprs_unit(call, *val):
   payload = val + ("U",) * 5
   aprs_send(call, "UNIT", *payload[:5])
+
 
 def parse_arguments():
   """Parse the command arguments"""
@@ -127,18 +198,42 @@ def parse_arguments():
   opts = parser.parse_args()
   return opts
 
+
+def process_data():
+  status = TelemStatus()
+  memory = MemInfo()
+  ifname = get_default_iface()
+  (rx_packets, tx_packets) = network_packets(ifname)
+
+  if status.rx_packets == 0:
+    status.rx_packets = rx_packets
+  if status.tx_packets == 0:
+    status.tx_packets = tx_packets
+
+  timelapse = int(time.time()) - status.timestamp
+
+  rx_stat = (rx_packets - status.rx_packets) / timelapse
+  tx_stat = (tx_packets - status.tx_packets) / timelapse
+
+  send_data(status.sequence, read_loadavg(), read_temperature(),
+            memory.get('MemFree', 0) / 1024, rx_stat, tx_stat)
+
+  status.rx_packets = rx_packets
+  status.tx_packets = tx_packets
+  status.save()
+
+
 def main():
   opts = parse_arguments()
-  memory = MemInfo()
 
   if opts.param:
-    aprs_param(CALL_SIGN, 'Cpu', 'Temp', 'FreeM')
+    aprs_param(CALL_SIGN, 'Cpu', 'Temp', 'FreeM', 'RxP', 'TxP')
   elif opts.unit:
-    aprs_unit(CALL_SIGN, 'Load', 'DegC', 'Mb')
+    aprs_unit(CALL_SIGN, 'Load', 'DegC', 'Mb', 'Pkt', 'Pkt')
   elif opts.eqns:
     aprs_eqns(CALL_SIGN, (0, 0.001, 0), (0, 0.001, 0))
   elif opts.data:
-    send_data(read_loadavg(), read_temperature(), memory.get('MemFree', 0) / 1024)
+    process_data()
 
 if __name__ == "__main__":
   main()
