@@ -9,6 +9,8 @@ The metrics sent by the iGate are:
  - Load average
  - CPU Temperature
  - Free Memory
+ - Network Tx packets
+ - Network Rx packets
 
 ## Usage:
 ```
