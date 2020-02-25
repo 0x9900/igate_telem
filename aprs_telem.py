@@ -102,15 +102,18 @@ def get_default_iface():
   # We are interested by the fields
   # 0 = iface, 1 = dest, 3 = flags
   route = "/proc/net/route"
-  with open(route, 'r') as rfd:
-    for line in rfd:
-      try:
-        rinfo = line.strip().split()
-        if rinfo[1] != '00000000' or not int(rinfo[3], 16) & 2:
+  try:
+    with open(route, 'r') as rfd:
+      for line in rfd:
+        try:
+          rinfo = line.strip().split()
+          if rinfo[1] != '00000000' or not int(rinfo[3], 16) & 2:
+            continue
+          return rinfo[0]
+        except KeyError:
           continue
-        return rinfo[0]
-      except KeyError:
-        continue
+  except IOError:
+    return 'eth0'
 
 
 def network_packets(iface):
@@ -157,7 +160,7 @@ def read_temperature():
 def send_data(sequence, *data):
   data = data + (0,) * 5
   payload = ','.join([str(x) for x in data[:5]])
-  print "T#{},{},00000000".format(sequence, payload)
+  print "T#{:03d},{},00000000".format(sequence, payload)
 
 
 def aprs_send(call, key, *val):
