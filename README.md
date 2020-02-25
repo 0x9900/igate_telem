@@ -12,6 +12,7 @@ The metrics sent by the iGate are:
 
 ## Usage:
 ```
+CBEACON delay=0:45 every=60:00 SENDTO=IG info="Telemetry https://github.com/0x9900/igate_telem"
 CBEACON delay=0:10 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --param"
 CBEACON delay=0:12 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --unit"
 CBEACON delay=0:14 every=5:00 SENDTO=IG infocmd="/usr/local/bin/aprs_telem --eqns"
