@@ -2,7 +2,7 @@
 #
 
 from setuptools import setup
-from igate_telem import __version__ as VERSION
+from igate.telem import __version__ as VERSION
 
 setup(
   name="igate_telem",

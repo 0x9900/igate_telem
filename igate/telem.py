@@ -10,10 +10,11 @@ from __future__ import print_function
 
 __author__ = "Fred C."
 __email__ = "<github-fred@hidzz.com>"
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import cPickle as pickle
 import itertools
+import os
 import re
 import time
 
@@ -21,7 +22,8 @@ from argparse import ArgumentParser
 from collections import Mapping
 from functools import partial
 
-STATUS_FILE = "/tmp/aprs_status.dat"
+TMPDIR = os.getenv('XDG_RUNTIME_DIR', '/tmp')
+STATUS_FILE = os.path.join(TMPDIR, "aprs_status.dat")
 
 LOADAVG_FILE = "/proc/loadavg"
 MEMINFO_FILE = "/proc/meminfo"
@@ -219,7 +221,7 @@ def process_data():
   if status.tx_packets == 0:
     status.tx_packets = tx_packets
 
-  timelapse = int(time.time()) - status.timestamp
+  timelapse = 1 + int(time.time()) - status.timestamp
 
   rx_stat = (rx_packets - status.rx_packets) / timelapse
   tx_stat = (tx_packets - status.tx_packets) / timelapse
