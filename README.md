@@ -24,3 +24,9 @@ CBEACON delay=0:15 every=5:00 SENDTO=IG infocmd="/usr/local/bin/igate_telem --da
 ## Example:
 
 https://www.aprsdirect.com/details/telemetry/sid/2703346
+
+## Blog post
+
+You can find more information on how to use and configure this program on my [blog post][1]
+
+[1]: https://0x9900.com/aprs-telemetry/
