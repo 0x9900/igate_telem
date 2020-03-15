@@ -24,7 +24,8 @@ from functools import partial
 
 # Insert at the end of the following line your callsign and SSID. Dont
 # forget the quotes. Example: CALL_SIGN = "W6BSD-5"
-CALL_SIGN =
+CALL_SIGN = "W6BSD-5"
+raise SystemError("Configure your callsign and remove this line")
 
 TMPDIR = os.getenv('XDG_RUNTIME_DIR', '/tmp')
 STATUS_FILE = os.path.join(TMPDIR, "aprs_status.dat")
