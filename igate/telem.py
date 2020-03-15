@@ -22,13 +22,16 @@ from argparse import ArgumentParser
 from collections import Mapping
 from functools import partial
 
+# Insert at the end of the following line your callsign and SSID. Dont
+# forget the quotes. Example: CALL_SIGN = "W6BSD-5"
+CALL_SIGN =
+
 TMPDIR = os.getenv('XDG_RUNTIME_DIR', '/tmp')
 STATUS_FILE = os.path.join(TMPDIR, "aprs_status.dat")
 
 LOADAVG_FILE = "/proc/loadavg"
 MEMINFO_FILE = "/proc/meminfo"
 
-CALL_SIGN = "W6BSD-5"
 THERMFILE = "/sys/class/thermal/thermal_zone0/temp"
 STANZA_TEMPLATE = ":{:9}:{}.{}"
 
