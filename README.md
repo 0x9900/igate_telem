@@ -13,6 +13,25 @@ The metrics sent by the iGate are:
  - Network Rx packets
 
 ## Usage:
+
+```
+pi@igate:~ $ igate_telem --help
+usage: igate_telem [-h] [-c CALLSIGN] (-d | -e | -p | -u)
+
+APRS RaspberryPi temperature
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CALLSIGN, --callsign CALLSIGN
+                        iGate full callsign [default: W6BSD-5
+  -d, --data            Send the APRS data
+  -e, --eqns            Send the APRS equation
+  -p, --param           Send the APRS param
+  -u, --unit            Send the APRS units
+```
+
+## Direwolf Configuration
+
 ```
 CBEACON delay=0:45 every=60:00 SENDTO=IG info="Telemetry https://github.com/0x9900/igate_telem"
 CBEACON delay=0:10 every=5:00 SENDTO=IG infocmd="/usr/local/bin/igate_telem --param"
