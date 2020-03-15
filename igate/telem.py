@@ -10,7 +10,7 @@ from __future__ import print_function
 
 __author__ = "Fred C."
 __email__ = "<github-fred@hidzz.com>"
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 import cPickle as pickle
 import itertools
@@ -196,6 +196,8 @@ def aprs_unit(call, *val):
 def parse_arguments():
   """Parse the command arguments"""
   parser = ArgumentParser(description="APRS RaspberryPi temperature")
+  parser.add_argument('-c', '--callsign', default=CALL_SIGN,
+                      help='iGate full callsign [default: %(default)s')
   cmds = parser.add_mutually_exclusive_group(required=True)
   cmds.add_argument('-d', '--data', action="store_true",
                     help="Send the APRS data")
@@ -238,11 +240,11 @@ def main():
   opts = parse_arguments()
 
   if opts.param:
-    aprs_param(CALL_SIGN, 'Cpu', 'Temp', 'FreeM', 'RxP', 'TxP')
+    aprs_param(opts.callsign, 'Cpu', 'Temp', 'FreeM', 'RxP', 'TxP')
   elif opts.unit:
-    aprs_unit(CALL_SIGN, 'Load', 'DegC', 'Mb', 'Pkt', 'Pkt')
+    aprs_unit(opts.callsign, 'Load', 'DegC', 'Mb', 'Pkt', 'Pkt')
   elif opts.eqns:
-    aprs_eqns(CALL_SIGN, (0, 0.001, 0), (0, 0.001, 0))
+    aprs_eqns(opts.callsign, (0, 0.001, 0), (0, 0.001, 0))
   elif opts.data:
     process_data()
 
