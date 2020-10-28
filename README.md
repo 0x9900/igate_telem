@@ -12,6 +12,19 @@ The metrics sent by the iGate are:
  - Network Tx packets
  - Network Rx packets
 
+## Installation
+
+Before installing igate_telem edit the file igate/telem.py and set the
+variable `CALL_SIGN` with your own call sign, then remove the
+following line.
+
+Once your call sign has been set run the following command to install the program.
+
+```
+sudo python setup.py install
+```
+
+
 ## Usage:
 
 ```
