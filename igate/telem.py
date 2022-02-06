@@ -6,8 +6,6 @@
 # EQNS. is a, b, c | DisplayValue = a * val ^ 2 + b * val + c
 # pylint: disable=missing-docstring
 
-from __future__ import print_function
-
 __author__ = "Fred C."
 __email__ = "<github-fred@hidzz.com>"
 __version__ = '0.1.2'
