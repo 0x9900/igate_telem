@@ -12,7 +12,7 @@ __author__ = "Fred C."
 __email__ = "<github-fred@hidzz.com>"
 __version__ = '0.1.2'
 
-import cPickle as pickle
+import pickle
 import itertools
 import os
 import re
@@ -66,7 +66,7 @@ class TelemStatus(object):
 
   def __init__(self):
     try:
-      with open(STATUS_FILE, 'r') as sfd:
+      with open(STATUS_FILE, 'rb') as sfd:
         self.st_data = pickle.loads(sfd.read())
     except IOError:
       self.st_data = dict(seq=0, timestamp=int(time.time()), rx_packets=0, tx_packets=0)
@@ -79,7 +79,7 @@ class TelemStatus(object):
   def save(self):
     self.st_data['timestamp'] = int(time.time())
     try:
-      with open(STATUS_FILE, 'w') as sfd:
+      with open(STATUS_FILE, 'wb') as sfd:
         sfd.write(pickle.dumps(self.st_data))
     except IOError as err:
       print(err)
