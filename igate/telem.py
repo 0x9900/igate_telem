@@ -225,10 +225,10 @@ def process_data():
   if status.tx_packets == 0:
     status.tx_packets = tx_packets
 
-  timelapse = 1 + int(time.time()) - status.timestamp
-
-  rx_stat = int((rx_packets - status.rx_packets) / timelapse)
-  tx_stat = int((tx_packets - status.tx_packets) / timelapse)
+  rx_stat = rx_packets - status.rx_packets
+  rx_stat = 0 if rx_stat < 0 else rx_stat
+  tx_stat = tx_packets - status.tx_packets
+  tx_stat = 0 if tx_stat < 0 else tx_stat
 
   send_data(status.sequence, read_loadavg(), read_temperature(),
             int(memory.get('MemFree', 0) / 1024), rx_stat, tx_stat)
