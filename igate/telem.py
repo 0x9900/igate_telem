@@ -227,11 +227,11 @@ def process_data():
 
   timelapse = 1 + int(time.time()) - status.timestamp
 
-  rx_stat = (rx_packets - status.rx_packets) / timelapse
-  tx_stat = (tx_packets - status.tx_packets) / timelapse
+  rx_stat = int((rx_packets - status.rx_packets) / timelapse)
+  tx_stat = int((tx_packets - status.tx_packets) / timelapse)
 
   send_data(status.sequence, read_loadavg(), read_temperature(),
-            memory.get('MemFree', 0) / 1024, rx_stat, tx_stat)
+            int(memory.get('MemFree', 0)) / 1024, rx_stat, tx_stat)
 
   status.rx_packets = rx_packets
   status.tx_packets = tx_packets
