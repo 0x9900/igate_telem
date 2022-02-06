@@ -231,7 +231,7 @@ def process_data():
   tx_stat = int((tx_packets - status.tx_packets) / timelapse)
 
   send_data(status.sequence, read_loadavg(), read_temperature(),
-            int(memory.get('MemFree', 0)) / 1024, rx_stat, tx_stat)
+            int(memory.get('MemFree', 0) / 1024), rx_stat, tx_stat)
 
   status.rx_packets = rx_packets
   status.tx_packets = tx_packets
