@@ -17,7 +17,7 @@ import re
 import time
 
 from argparse import ArgumentParser
-from collections import Mapping
+from collections.abc import Mapping
 from functools import partial
 
 # Insert at the end of the following line your callsign and SSID. Dont
@@ -45,7 +45,10 @@ class MemInfo(Mapping):
     try:
       with open(MEMINFO_FILE, 'r') as mfd:
         for line in mfd:
-          key, value, _ = line.split()
+          try:
+            key, value, _ = line.split()
+          except:
+            key, value = line.split()
           MemInfo._cache[clean(key)] = int(value)
     except IOError:
       pass
