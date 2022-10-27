@@ -15,9 +15,10 @@ import itertools
 import os
 import re
 import time
+import sys
 
 from argparse import ArgumentParser
-from collections import Mapping
+from collections.abc import Mapping
 from functools import partial
 
 # Insert at the end of the following line your callsign and SSID. Dont
@@ -45,8 +46,11 @@ class MemInfo(Mapping):
     try:
       with open(MEMINFO_FILE, 'r') as mfd:
         for line in mfd:
-          key, value, _ = line.split()
-          MemInfo._cache[clean(key)] = int(value)
+          try:
+            key, value, *_ = line.split()
+            MemInfo._cache[clean(key)] = int(value)
+          except ValueError as err:
+            print("{} error: {}".format(MEMINFO_FILE, err), file=sys.stderr)
     except IOError:
       pass
 
@@ -80,7 +84,7 @@ class TelemStatus(object):
       with open(STATUS_FILE, 'wb') as sfd:
         sfd.write(pickle.dumps(self.st_data))
     except IOError as err:
-      print(err)
+      print(err, file=sys.stderr)
 
   @property
   def sequence(self):
@@ -105,7 +109,6 @@ class TelemStatus(object):
   @tx_packets.setter
   def tx_packets(self, value):
     self.st_data['tx_packets'] = value
-
 
 
 def get_default_iface():
