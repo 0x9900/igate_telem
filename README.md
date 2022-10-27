@@ -55,7 +55,7 @@ CBEACON delay=0:15 every=5:00 SENDTO=IG infocmd="/usr/local/bin/igate_telem --da
 
 ## Example:
 
-https://www.aprsdirect.com/details/telemetry/sid/2703346
+https://aprs.fi/telemetry/a/W6BSD-5
 
 ## Blog post
 
